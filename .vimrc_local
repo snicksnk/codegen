@@ -1,0 +1,5 @@
+:set tabstop=2
+:set shiftwidth=2
+:set expandtab
+
+let g:syntastic_javascript_eslint_args = "--no-eslintrc --config .eslintrc"

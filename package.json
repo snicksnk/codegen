@@ -1,0 +1,22 @@
+{
+  "name": "codegen",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Yuri Taratorkin",
+  "license": "GPL V3",
+  "scripts": {
+    "dev": "./node_modules/nodemon/bin/nodemon.js src/index.js"
+  },
+  "dependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "co": "^4.6.0",
+    "lodash": "^4.17.4",
+    "nodemon": "^1.11.0",
+    "recursive-readdir": "^2.1.1"
+  },
+  "description": "declarative codegenerator",
+  "repository": "https://github.com/snicksnk/codegen"
+}
