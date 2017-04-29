@@ -6,6 +6,7 @@ class {% name %} {
     then(callback) {
         throw new Error("{% name%}.then: not yet defined")
     }
+
     {%
         capabilities.map(method =>
         %{
