@@ -13,6 +13,7 @@
     "babel-polyfill": "^6.23.0",
     "babel-preset-stage-0": "^6.24.1",
     "co": "^4.6.0",
+    "js-string-escape": "https://github.com/joliss/js-string-escape",
     "lodash": "^4.17.4",
     "nodemon": "^1.11.0",
     "recursive-readdir": "^2.1.1"

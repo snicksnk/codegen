@@ -1,0 +1,17 @@
+class {% name %} {
+    constructor(run{% name %}) {
+        this.run{% name %} = run{% name %}
+    }
+
+    then(callback) {
+        throw new Error("{% name%}.then: not yet defined")
+    }
+    {%
+        capabilities.map(method =>
+        %{
+            {% method %}() {
+                throw new Error("{% name %}.{% method %}: not yet defined")
+            }
+        }%)
+    %}
+}
