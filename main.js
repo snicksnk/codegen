@@ -11,6 +11,9 @@ var source = require('fs').readFileSync('monad.schema').toString()
 
 var testValue = schema.parse(source)
 
+console.log("")
+console.log("PARSE TREE:")
+console.log("==========")
 log(testValue.value)
 
 var gen = compileToFunction(testValue.value, ["name", "capabilities"])
@@ -18,4 +21,7 @@ var gen = compileToFunction(testValue.value, ["name", "capabilities"])
 var name = "Reader"
 var capabilities = ["ask", "local"]
 
-process.stdout.write(gen({name, capabilities}))
+console.log("")
+console.log("GENERATED MODULE:")
+console.log("================")
+console.log(gen({name, capabilities}))

@@ -51,7 +51,7 @@ function compileToFunction(tree, configKeys) {
             var newPos = tree.pos && tree.pos.col - 1 || 0
             var unindented = tree.text.map(unindentLine(newPos))
             var converted = unindented.map(line => line.map(convertWord).join(" + "))
-            return converted.join(" + '\\n' + ")
+            return converted.join(" + '\\n'\n + ")
         }
 
         if (tree.code) {
@@ -66,6 +66,11 @@ function compileToFunction(tree, configKeys) {
     var toStringDecl = "function toS(s) { return s instanceof Array? s.map(toS).join('') : s }\n"
     var text = toStringDecl + keyDecls + "\nreturn " + recure(tree)
     var fullText = "(config) => {\n" + text + "}"
+
+    console.log("")
+    console.log("GENERATOR FUNCTION:")
+    console.log("==================")
+    console.log(fullText + "\n")
 
     return eval(fullText)
 }

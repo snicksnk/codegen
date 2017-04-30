@@ -1,3 +1,6 @@
+
+var assert = require('assert')
+
 function defined(x) { return x !== undefined }
 
 /*
