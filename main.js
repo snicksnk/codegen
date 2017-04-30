@@ -11,6 +11,8 @@ var source = require('fs').readFileSync('monad.schema').toString()
 
 var testValue = schema.parse(source)
 
+log(testValue.value)
+
 var gen = compileToFunction(testValue.value, ["name", "capabilities"])
 
 var name = "Reader"
