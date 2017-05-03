@@ -1,47 +1,47 @@
 
-var assert = require('assert')
+const assert = require('assert');
 
-function defined(x) { return x !== undefined }
+function defined(x) { return x !== undefined; }
 
 /*
     Holds information about where we are in the input string.
 */
 class Position {
-    static of(offset, line, col) {
-        return new Position(offset, line || 1, col || 1)
-    }
+  static of(offset, line, col) {
+    return new Position(offset, line || 1, col || 1);
+  }
 
-    constructor(offset, line, col) {
-        this.offset = offset
-        this.line   = line
-        this.col    = col
-    }
+  constructor(offset, line, col) {
+    this.offset = offset;
+    this.line = line;
+    this.col = col;
+  }
 
     /*
         Move n chars through the text. We have to do it char-by-char,
         because we want to track lines and columns.
     */
-    advance(n, text) {
-        var line = this.line
-        var col  = this.col
-        var i    = this.offset
-        for (; i < this.offset + n; i++) {
-            if (text[i] == '\n') {
-                line++
-                col = 1
-            } else {
-                col++
-            }
-        }
-        return Position.of(i, line, col)
+  advance(n, text) {
+    let line = this.line;
+    let col = this.col;
+    let i = this.offset;
+    for (; i < this.offset + n; i++) {
+      if (text[i] === '\n') {
+        line++;
+        col = 1;
+      } else {
+        col++;
+      }
     }
+    return Position.of(i, line, col);
+  }
 
     /*
         Test if current position is ahead of other one.
     */
-    aheadOf(other) {
-        return this.offset > other.offset
-    }
+  aheadOf(other) {
+    return this.offset > other.offset;
+  }
 }
 
 /*
@@ -51,36 +51,36 @@ class Stream {
     /*
         Make new stream of given text and position.
     */
-    static of(text, pos) {
-        return new Stream(text, pos || Position.of(0))
-    }
+  static of(text, pos) {
+    return new Stream(text, pos || Position.of(0));
+  }
 
-    constructor(text, position) {
-        this.text = text
-        this.position = position
-    }
+  constructor(text, position) {
+    this.text = text;
+    this.position = position;
+  }
 
     /*
         Check if current stream state is ahead of other one.
     */
-    aheadOf(other) {
-        return this.position.aheadOf(other.position)
-    }
+  aheadOf(other) {
+    return this.position.aheadOf(other.position);
+  }
 
     /*
         Move position of current stream n chars ahead.
     */
-    advance(n) {
-        return Stream.of(this.text, this.position.advance(n, this.text))
-    }
+  advance(n) {
+    return Stream.of(this.text, this.position.advance(n, this.text));
+  }
 
-    end() {
-        return this.text.length
-    }
+  end() {
+    return this.text.length;
+  }
 
-    location() {
-        return this.position.offset
-    }
+  location() {
+    return this.position.offset;
+  }
 
     /*
         Cut off a piece of given size.
@@ -94,23 +94,23 @@ class Stream {
 
         stream.take(5) === {value: "lo, w", stream: "orld"}
     */
-    take(n) {
-        if (this.location() + n <= this.end()) {
-            return {
-                value: this.text.substr(this.location(), n),
-                stream: this.advance(n)
-            }
-        } else {
-            return {
-                error: "not eof",
-                stream: this
-            }
-        }
+  take(n) {
+    if (this.location() + n <= this.end()) {
+      return {
+        value: this.text.substr(this.location(), n),
+        stream: this.advance(n)
+      };
+    } else {
+      return {
+        error: 'not eof',
+        stream: this
+      };
     }
+  }
 
-    toString() {
-        return this.text.slice(this.location(), 50)
-    }
+  toString() {
+    return this.text.slice(this.location(), 50);
+  }
 }
 
 class Parser {
@@ -119,32 +119,32 @@ class Parser {
 
         (stream -> {value | error, stream}) -> Parser
     */
-    constructor(runParser) {
-        this.runParser = runParser
-    }
+  constructor(runParser) {
+    this.runParser = runParser;
+  }
 
     /*
         Parse a string of text.
     */
-    parse(text) {
-        return this.runParser(Stream.of(text))
-    }
+  parse(text) {
+    return this.runParser(Stream.of(text));
+  }
 
     /*
         Make parser that returns given "value" on any input
         (and doesn't consume any input).
     */
-    static of(value) {
-        return new Parser(stream => ({stream, value}))
-    }
+  static of(value) {
+    return new Parser(stream => ({ stream, value }));
+  }
 
     /*
         Make parser that throws given "error" on any input
         (and doesn't consume any input).
     */
-    static fail(error) {
-        return new Parser(stream => ({stream, error}))
-    }
+  static fail(error) {
+    return new Parser(stream => ({ stream, error }));
+  }
 
     /*
         Like Promise#then.
@@ -154,49 +154,49 @@ class Parser {
 
         Parser.then :: (this: Parser, (value) -> Parser) -> Parser
     */
-    then(rest) {
-        return new Parser(stream => {
-            var res = this.runParser(stream)
-            var p   = rest(res.value)
+  then(rest) {
+    return new Parser(stream => {
+      const res = this.runParser(stream);
+      const p = rest(res.value);
 
-            assert(p instanceof Parser, "Promise#then: argument didn't return parser")
+      assert(p instanceof Parser, "Promise#then: argument didn't return parser");
 
-            return defined(res.value)
+      return defined(res.value)
                 ? p.runParser(res.stream)
-                : res
-        })
-    }
+                : res;
+    });
+  }
 
     /*
         Run this parser, it it fails, run "other" parser.
     */
-    or(other) {
-        return new Parser(stream => {
-            var res = this.runParser(stream)
-            return defined(res.value) || res.stream.aheadOf(stream)
+  or(other) {
+    return new Parser(stream => {
+      const res = this.runParser(stream);
+      return defined(res.value) || res.stream.aheadOf(stream)
                 ? res
-                : other.runParser(stream)
-        })
-    }
+                : other.runParser(stream);
+    });
+  }
 
     /*
         Succeed, it current parser fails; fail, if current parser succeeds.
     */
-    not() {
-        return new Parser(stream => {
-            var res = this.runParser(stream)
-            return defined(res.value)
-                ? {error: "not", stream}
-                : {value: true, stream}
-        })
-    }
+  not() {
+    return new Parser(stream => {
+      const res = this.runParser(stream);
+      return defined(res.value)
+                ? { error: 'not', stream }
+                : { value: true, stream };
+    });
+  }
 
     /*
         Check that other parser doesn't succeed, the run current one.
     */
-    butNot(other) {
-        return other.not()._and(this)
-    }
+  butNot(other) {
+    return other.not()._and(this);
+  }
 
     /*
         Run this parser, run other parser, return result of _current_ parser.
@@ -204,51 +204,56 @@ class Parser {
         Rule of thumb: when you see _ in the method name, that means the result
         of this side will be discarded.
     */
-    and_(other) {
-        return this.then(x => other.map(_ => x))
-    }
+  and_(other) {
+    return this.then(x => other.map(_ => x));
+  }
 
     /*
         Run this parser, run other parser, return result of _other_ parser.
     */
-    _and(other) {
-        return this.then(_ => other)
-    }
+  _and(other) {
+    return this.then(_ => other);
+  }
 
     /*
         Apply a pure function to result of current parser (if any).
     */
-    map(f) {
-        return this.then(x => Parser.of(f(x)))
-    }
+  map(f) {
+    return this.then(x => Parser.of(f(x)));
+  }
 
     /*
         Apply parser to the input until it fails. Return an array of results.
     */
-    many() {
-        return new Parser(stream => {
-            var res, acc = []
-            while (defined((res = this.runParser(stream)).value)) {
-                if (!res.stream.aheadOf(stream)) {
-                    throw new Error(
-                        "Parser#many(p): p was not productive at "
-                        + stream
-                    )
-                }
-                acc.push(res.value)
-                stream = res.stream
-            }
-            return {value: acc, stream}
-        })
-    }
+  many() {
+    return new Parser(stream0 => {
+      let stream = stream0;
+      const acc = [];
+      while (true) {
+        const res = this.runParser(stream);
+        if (!defined(res.value)) {
+          break;
+        }
+        if (!res.stream.aheadOf(stream)) {
+          throw new Error(
+                        `Parser#many(p): p was not productive at ${
+                         stream}`
+                    );
+        }
+        acc.push(res.value);
+        stream = res.stream;
+      }
+      return { value: acc, stream };
+    });
+  }
 
     /*
         Call ".join(sep)" on the result of current parser.
         We're not in haskell, where "type String = List Char", so we need this.
     */
-    join(sep) {
-        return this.map(x => x.join(sep || ""))
-    }
+  join(sep) {
+    return this.map(x => x.join(sep || ''));
+  }
 
     /*
         P.string('a').sepBy(P.string('+')).parse("a+a+a+a-b")
@@ -257,11 +262,11 @@ class Parser {
 
         It keeps both elements (current parser results) and separators.
     */
-    sepBy(sep) {
-        var concat = (acc, d) => acc.concat(d)
-        var pair = sep.then(x => this.map(y => [x, y]))
-        return this.then(x => pair.many().map(xs => xs.reduce(concat, [x])))
-    }
+  sepBy(sep) {
+    const concat = (acc, d) => acc.concat(d);
+    const pair = sep.then(x => this.map(y => [x, y]));
+    return this.then(x => pair.many().map(xs => xs.reduce(concat, [x])));
+  }
 
     /*
         P.string('a').sepBy_(P.string('+')).parse("a+a+a+a-b")
@@ -270,36 +275,36 @@ class Parser {
 
         It keeps only elements (current parser results).
     */
-    sepBy_(sep) {
-        return this.then(x => sep._and(this).many().map(xs => [x].concat(xs)))
-    }
+  sepBy_(sep) {
+    return this.then(x => sep._and(this).many().map(xs => [x].concat(xs)));
+  }
 
-    mark(label) {
-        return this.map(x => ({[label]: x}))
-    }
+  mark(label) {
+    return this.map(x => ({ [label]: x }));
+  }
 
     /*
         Run current parser. If it fails, undo its input consumption.
         Allows to use Parser#or() on parsers that consumed input before failing.
     */
-    try() {
-        return new Parser(stream => {
-            var res = this.runParser(stream)
+  try() {
+    return new Parser(stream => {
+      const res = this.runParser(stream);
 
-            if (!defined(res.value)) {
-                res.stream = stream
-            }
+      if (!defined(res.value)) {
+        res.stream = stream;
+      }
 
-            return res
-        })
-    }
+      return res;
+    });
+  }
 
     /*
         Fail on false, succeed on true.
     */
-    guard(bool) {
-        return bool? Parser.of(true) : Parser.fail("guard")
-    }
+  guard(bool) {
+    return bool ? Parser.of(true) : Parser.fail('guard');
+  }
 
     /*
         Premade parser. Will parse given "str" or fail consuming no input.
@@ -310,31 +315,31 @@ class Parser {
         P.string('hello').parse("hell, world")
             === {error: "hello", stream: "hell, world"}
     */
-    static string(str) {
-        return new Parser(stream => {
-            var res = stream.take(str.length)
-            if (!defined(res.value)) {
-                return res
-            }
+  static string(str) {
+    return new Parser(stream => {
+      const res = stream.take(str.length);
+      if (!defined(res.value)) {
+        return res;
+      }
 
-            if (str !== res.value) {
-                return {
-                    error: str,
-                    stream
-                }
-            }
+      if (str !== res.value) {
+        return {
+          error: str,
+          stream
+        };
+      }
 
-            return {value: str, stream: res.stream}
-        })
-    }
+      return { value: str, stream: res.stream };
+    });
+  }
 
     /*
         Premade parser. Will parse any char, if there are remaining chars
         in input stream.
     */
-    static anyChar() {
-        return new Parser(stream => stream.take(1))
-    }
+  static anyChar() {
+    return new Parser(stream => stream.take(1));
+  }
 
     /*
         Allows parsers to depend recursively.
@@ -343,21 +348,21 @@ class Parser {
 
         It calls "thunk" (producing a parser) on first "runParser" invocation.
     */
-    static later(thunk) {
-        var cell = null
-        return new Parser(stream => {
-            cell = cell || thunk()
-            return cell.runParser(stream)
-        })
-    }
+  static later(thunk) {
+    let cell = null;
+    return new Parser(stream => {
+      cell = cell || thunk();
+      return cell.runParser(stream);
+    });
+  }
 
     /*
         Return current position of the parser.
     */
-    static position() {
-        return new Parser(stream => ({value: stream.position, stream}))
-    }
+  static position() {
+    return new Parser(stream => ({ value: stream.position, stream }));
+  }
 }
 
-module.exports = { Parser }
+module.exports = { Parser };
 

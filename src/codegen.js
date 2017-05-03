@@ -2,7 +2,7 @@ const _ = require('lodash');
 const co = require('co');
 const Reader = require('./fileReader');
 
-
+const { compileToFunction } = require('./templater/interpolator');
 
 const processors = [
   {
@@ -20,11 +20,11 @@ const processors = [
     name: 'JustCopy',
     prefix: '',
     priority: 10,
-    run: (filePresent, config) => new Promise(() => new Promise((res) => {
+    run: (filePresent, config) => new Promise((res) => {
       console.log('JustCopy-------', filePresent, config);
-
+      const fun = compileToFunction('hello {% damn %} world', ['damn']);
       res([]);
-    }))
+    })
   }
 ];
 
@@ -95,7 +95,7 @@ const reader = new Reader('template');
 const config = {
   templateDirPath: '../template',
   resultDirPath: '../result'
-}
+};
 
 processTemplateDir(reader, processors)
   .then(tasks => tasks)
